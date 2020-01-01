@@ -30,6 +30,9 @@
 <button id="add" onclick="add()" class="safe">add</button>
 <button onclick="save()" class="safe">save</button>
 <button onclick="retrieve()" class="warn">retrieve</button>
+<input type="text" id="group" placeholder="group (default: words)">
+<button id="change_group" onclick="change_group()" class="safe">change group</button>
+<br>
 <input type="text" id="delete" placeholder="word to delete">
 <button onclick="delete_element()" class="warn">delete</button>
 <button onclick="delete_all()" class="warn">delete all</button>
@@ -49,7 +52,8 @@
 <p id="keys" class="a"></p>
 
 <script>
-// variables
+// global variables
+group = "words";
 words = new Set();
 extracted = [];
 keys = new Set();
@@ -60,6 +64,14 @@ function init() {
 	retrieve();
 	retrieve_keys();
 	view_keys();
+}
+function change_group() {
+	var inp = document.getElementById("group");
+	if(inp.value!="") {
+		group = inp.value;
+		inp.value = "";
+		retrieve();
+	}
 }
 function submit() {
 	var key = document.getElementById("name");
@@ -102,16 +114,16 @@ function access() {
 		key.value = "";
 	}
 }
-var input = document.getElementById("input");
-input.addEventListener("keyup", function(event) {
+document.getElementById("input").addEventListener("keyup", function(event) {
   if (event.keyCode === 13) {
    event.preventDefault();
    document.getElementById("add").click();
   }
 });
 function update() {
-	if(show) document.getElementById("words").innerHTML = [...words].toString();
-	else document.getElementById("words").innerHTML = "";
+	var disp = document.getElementById("words");
+	if(show) disp.innerHTML = group+": "+[...words].toString();
+	else disp.innerHTML = "";
 }
 function show_words() {
 	show = true;
@@ -132,10 +144,11 @@ function add() {
 	update();
 }
 function save() {
-	localStorage.setItem("words", JSON.stringify([...words]));
+	localStorage.setItem(group, JSON.stringify([...words]));
+	console.log(JSON.stringify([...words]));
 }
 function retrieve() {
-	words = new Set(JSON.parse(localStorage.getItem("words")));
+	words = new Set(JSON.parse(localStorage.getItem(group)));
 	update();
 }
 function getRandom(arr, n) {
