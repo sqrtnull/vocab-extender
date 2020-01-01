@@ -50,6 +50,7 @@
 <button onclick="access()" class="safe">access</button>
 <button onclick="delete_key()" class="warn">delete</button>
 <button onclick="clear_box()" class="warn">clear text (above)</button>
+<button onclick="upload_box()" class="warn">upload words (above)</button>
 <p id="keys" class="a"></p>
 
 <script>
@@ -66,6 +67,15 @@ function init() {
 	retrieve();
 	retrieve_keys();
 	view_keys();
+}
+function upload_box() {
+	var box = document.getElementById("p");
+	var arr = box.value.split(" ");
+	for(i in arr) {
+		words.add(arr[i]);
+	}
+	box.value = "";
+	update();
 }
 function trigger_autosave() {
 	var AS = document.getElementById("AS");
