@@ -34,12 +34,13 @@
 <button id="change_group" onclick="change_group()" class="safe">change group</button>
 <button onclick="delete_all()" class="warn">delete all in current group</button>
 <br>
+<button onclick="toggle_groups()" class="safe">show/hide groups</button>
 <input type="text" id="delete" placeholder="word to delete">
 <button onclick="delete_element()" class="warn">delete</button>
 <button onclick="trigger_autosave()" class="safe" id="AS">autosave: OFF</button>
+<p id="groups" class="a"></p>
 <p id="words" class="a"></p>
-<button onclick="show_words()" class="safe">show</button>
-<button onclick="hide_words()" class="safe">hide</button>
+<button onclick="toggle_words()" class="safe">show/hide words</button>
 <button onclick="extract(5)" class="safe">extract</button>
 <button onclick="delete_extracted()" class="warn">delete extracted</button>
 <p id="extract"></p>
@@ -56,20 +57,31 @@
 <script>
 // global variables
 group = "words";
+groups = new Set(["words"]);
 words = new Set();
 extracted = [];
 keys = new Set();
 show = true;
+show_groups = false;
 autosave = false;
 
 // code
 function init() {
 	retrieve();
 	retrieve_keys();
+	retrieve_groups();
 	view_keys();
+}
+function purge() {
+	localStorage.clear();
 }
 function upload_box() {
 	var box = document.getElementById("p");
+	if(box.value=="/purge local") {
+		localStorage.clear();
+		box.value = "";
+		return;
+	}
 	var arr = box.value.split(" ");
 	for(i in arr) {
 		words.add(arr[i]);
@@ -91,8 +103,14 @@ function change_group() {
 	var inp = document.getElementById("group");
 	if(inp.value!="") {
 		group = inp.value;
+		console.log(!groups.has(inp.value));
+		if(!groups.has(inp.value)) {
+			groups.add(inp.value);
+			console.log("adding group "+inp.value, groups);
+		}
 		inp.value = "";
 		retrieve();
+		retrieve_keys();
 	}
 }
 function submit() {
@@ -101,7 +119,7 @@ function submit() {
 	if(key.value!="" && para.value!="") {
 		keys.add(key.value);
 		update_keys();
-		localStorage.setItem("key-"+key.value, para.value);
+		localStorage.setItem("key-"+group+"-"+key.value, para.value);
 		para.value = "";
 		key.value = "";
 		view_keys();
@@ -111,16 +129,16 @@ function clear_box() {
 	document.getElementById("p").value = "";
 }
 function retrieve_keys() {
-	keys = new Set(JSON.parse(localStorage.getItem("vocab-extender-keys")));
+	keys = new Set(JSON.parse(localStorage.getItem("vocab-extender-keys-"+group)));
 }
 function update_keys() {
-	localStorage.setItem("vocab-extender-keys", JSON.stringify([...keys]));
+	localStorage.setItem("vocab-extender-keys"+group, JSON.stringify([...keys]));
 }
 function delete_key() {
 	var key = document.getElementById("key");
 	if(keys.has(key.value)) {
 		keys.delete(key.value);
-		localStorage.removeItem("key-"+key.value);
+		localStorage.removeItem("key-"+group+"-"+key.value);
 		view_keys();
 		update_keys();
 		key.value = "";
@@ -132,7 +150,7 @@ function view_keys() {
 function access() {
 	var key = document.getElementById("key");
 	if(keys.has(key.value)) {
-		document.getElementById("p").value = localStorage.getItem("key-"+key.value);
+		document.getElementById("p").value = localStorage.getItem("key-"+group+"-"+key.value);
 		key.value = "";
 	}
 }
@@ -144,16 +162,21 @@ document.getElementById("input").addEventListener("keyup", function(event) {
 });
 function update() {
 	var disp = document.getElementById("words");
+	var gdisp = document.getElementById("groups");
 	if(show) disp.innerHTML = group+": "+[...words].toString();
 	else disp.innerHTML = "";
+	if(show_groups) gdisp.innerHTML = "groups: "+[...groups].toString();
+	else gdisp.innerHTML = "";
 	if(autosave) save();
 }
-function show_words() {
-	show = true;
+function toggle_groups() {
+	if(show_groups) show_groups=false;
+	else show_groups=true;
 	update();
 }
-function hide_words() {
-	show = false;
+function toggle_words() {
+	if(show) show=false;
+	else show = true;
 	update();
 }
 function delete_all() {
@@ -168,11 +191,16 @@ function add() {
 }
 function save() {
 	localStorage.setItem("group-"+group, JSON.stringify([...words]));
+	localStorage.setItem("groups", JSON.stringify([...groups]));
 	// DO NOT update()
 }
 function retrieve() {
 	words = new Set(JSON.parse(localStorage.getItem("group-"+group)));
 	update();
+}
+function retrieve_groups() {
+	groups = new Set(JSON.parse(localStorage.getItem("groups")));
+	groups.add("words");
 }
 function getRandom(arr, n) {
     var result = new Array(n),
