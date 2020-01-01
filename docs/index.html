@@ -122,7 +122,7 @@ function view_keys() {
 function access() {
 	var key = document.getElementById("key");
 	if(keys.has(key.value)) {
-		document.getElementById("p").value = localStorage.getItem("key"+key.value);
+		document.getElementById("p").value = localStorage.getItem("key-"+key.value);
 		key.value = "";
 	}
 }
