@@ -101,10 +101,10 @@ function clear_box() {
 	document.getElementById("p").value = "";
 }
 function retrieve_keys() {
-	keys = new Set(JSON.parse(localStorage.getItem("keys")));
+	keys = new Set(JSON.parse(localStorage.getItem("vocab-extender-keys")));
 }
 function update_keys() {
-	localStorage.setItem("keys", JSON.stringify([...keys]));
+	localStorage.setItem("vocab-extender-keys", JSON.stringify([...keys]));
 }
 function delete_key() {
 	var key = document.getElementById("key");
