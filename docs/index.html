@@ -136,7 +136,7 @@ function update() {
 	var disp = document.getElementById("words");
 	if(show) disp.innerHTML = group+": "+[...words].toString();
 	else disp.innerHTML = "";
-	save();
+	if(autosave) save();
 }
 function show_words() {
 	show = true;
