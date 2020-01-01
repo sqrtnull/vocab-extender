@@ -29,13 +29,14 @@
 <input type="text" id="input" placeholder="word to add">
 <button id="add" onclick="add()" class="safe">add</button>
 <button onclick="save()" class="safe">save</button>
-<button onclick="retrieve()" class="warn">retrieve</button>
+<button onclick="retrieve()" class="warn">load</button>
 <input type="text" id="group" placeholder="group (default: words)">
 <button id="change_group" onclick="change_group()" class="safe">change group</button>
 <br>
 <input type="text" id="delete" placeholder="word to delete">
 <button onclick="delete_element()" class="warn">delete</button>
-<button onclick="delete_all()" class="warn">delete all</button>
+<!--<button onclick="delete_all()" class="warn">delete all</button>-->
+<button onclick="trigger_autosave()" class="safe" id="AS">autosave: OFF</button>
 <p id="words" class="a"></p>
 <button onclick="show_words()" class="safe">show</button>
 <button onclick="hide_words()" class="safe">hide</button>
@@ -45,10 +46,10 @@
 <textarea class="a" id="p" placeholder="Use the extracted words to write a paragraph"></textarea> <br>
 <input type="text" id="name" placeholder="name the paragraph">
 <button onclick="submit()" class="safe">submit</button>
-<input type="text" id="key" placeholder="key to access or delete">
+<input type="text" id="key" placeholder="name to access or delete">
 <button onclick="access()" class="safe">access</button>
-<button onclick="clear_box()" class="safe">clear</button>
-<button onclick="delete_key()" class="warn">delete key</button>
+<button onclick="delete_key()" class="warn">delete</button>
+<button onclick="clear_box()" class="warn">clear text (above)</button>
 <p id="keys" class="a"></p>
 
 <script>
@@ -58,12 +59,23 @@ words = new Set();
 extracted = [];
 keys = new Set();
 show = true;
+autosave = false;
 
 // code
 function init() {
 	retrieve();
 	retrieve_keys();
 	view_keys();
+}
+function trigger_autosave() {
+	var AS = document.getElementById("AS");
+	if(autosave) {
+		AS.innerHTML = "autosave: OFF";
+		autosave = false;
+	} else {
+		AS.innerHTML = "autosave: ON";
+		autosave = true;
+	}
 }
 function change_group() {
 	var inp = document.getElementById("group");
@@ -105,7 +117,7 @@ function delete_key() {
 	}
 }
 function view_keys() {
-	document.getElementById("keys").innerHTML = "keys: "+[...keys].toString();
+	document.getElementById("keys").innerHTML = "names: "+[...keys].toString();
 }
 function access() {
 	var key = document.getElementById("key");
@@ -124,6 +136,7 @@ function update() {
 	var disp = document.getElementById("words");
 	if(show) disp.innerHTML = group+": "+[...words].toString();
 	else disp.innerHTML = "";
+	save();
 }
 function show_words() {
 	show = true;
@@ -145,7 +158,7 @@ function add() {
 }
 function save() {
 	localStorage.setItem(group, JSON.stringify([...words]));
-	console.log(JSON.stringify([...words]));
+	// DO NOT update()
 }
 function retrieve() {
 	words = new Set(JSON.parse(localStorage.getItem(group)));
