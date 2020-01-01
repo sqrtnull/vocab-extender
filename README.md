@@ -1,3 +1,4 @@
 # vocab-extender
-tool to help you extend your vocab into paragraphs
-https://sqrtnull.github.io/vocab-extender/index.html
+A tool to help you extend your vocab into paragraphs
+
+https://sqrtnull.github.io/vocab-extender
