@@ -91,7 +91,7 @@ function submit() {
 	if(key.value!="" && para.value!="") {
 		keys.add(key.value);
 		update_keys();
-		localStorage.setItem(key.value, para.value);
+		localStorage.setItem("key-"+key.value, para.value);
 		para.value = "";
 		key.value = "";
 		view_keys();
@@ -110,7 +110,7 @@ function delete_key() {
 	var key = document.getElementById("key");
 	if(keys.has(key.value)) {
 		keys.delete(key.value);
-		localStorage.removeItem(key.value);
+		localStorage.removeItem("key-"+key.value);
 		view_keys();
 		update_keys();
 		key.value = "";
@@ -122,7 +122,7 @@ function view_keys() {
 function access() {
 	var key = document.getElementById("key");
 	if(keys.has(key.value)) {
-		document.getElementById("p").value = localStorage.getItem(key.value);
+		document.getElementById("p").value = localStorage.getItem("key"+key.value);
 		key.value = "";
 	}
 }
@@ -157,11 +157,11 @@ function add() {
 	update();
 }
 function save() {
-	localStorage.setItem(group, JSON.stringify([...words]));
+	localStorage.setItem("group-"+group, JSON.stringify([...words]));
 	// DO NOT update()
 }
 function retrieve() {
-	words = new Set(JSON.parse(localStorage.getItem(group)));
+	words = new Set(JSON.parse(localStorage.getItem("group-"+group)));
 	update();
 }
 function getRandom(arr, n) {
