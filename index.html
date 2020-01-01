@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+	<style type="text/css">
+		p.a {
+			width: 80vw;
+			word-break: break-all;
+		}
+		textarea.a {
+			resize: none;
+			width: 80vw;
+			height: 60vw;
+			word-break: break-all;
+		}
+		button.safe {
+			color: green;
+		}
+		button.warn {
+			color: red;
+		}
+	</style>
+</head>
+<body onload="init()">
+
+<h3>Vocab</h3>
+
+<div id="result"></div>
+<input type="text" id="input" placeholder="word to add">
+<button id="add" onclick="add()" class="safe">add</button>
+<button onclick="save()" class="safe">save</button>
+<button onclick="retrieve()" class="warn">retrieve</button>
+<input type="text" id="delete" placeholder="word to delete">
+<button onclick="delete_element()" class="warn">delete</button>
+<button onclick="delete_all()" class="warn">delete all</button>
+<p id="words" class="a"></p>
+<button onclick="show_words()" class="safe">show</button>
+<button onclick="hide_words()" class="safe">hide</button>
+<button onclick="extract(5)" class="safe">extract</button>
+<button onclick="delete_extracted()" class="warn">delete extracted</button>
+<p id="extract"></p>
+<textarea class="a" id="p" placeholder="Use the extracted words to write a paragraph"></textarea> <br>
+<input type="text" id="name" placeholder="name the paragraph">
+<button onclick="submit()" class="safe">submit</button>
+<input type="text" id="key" placeholder="key to access or delete">
+<button onclick="access()" class="safe">access</button>
+<button onclick="clear_box()" class="safe">clear</button>
+<button onclick="delete_key()" class="warn">delete key</button>
+<p id="keys" class="a"></p>
+
+<script>
+// variables
+words = new Set();
+extracted = [];
+keys = new Set();
+show = true;
+
+// code
+function init() {
+	retrieve();
+	retrieve_keys();
+	view_keys();
+}
+function submit() {
+	var key = document.getElementById("name");
+	var para = document.getElementById("p");
+	if(key.value!="" && para.value!="") {
+		keys.add(key.value);
+		update_keys();
+		localStorage.setItem(key.value, para.value);
+		para.value = "";
+		key.value = "";
+		view_keys();
+	}
+}
+function clear_box() {
+	document.getElementById("p").value = "";
+}
+function retrieve_keys() {
+	keys = new Set(JSON.parse(localStorage.getItem("keys")));
+}
+function update_keys() {
+	localStorage.setItem("keys", JSON.stringify([...keys]));
+}
+function delete_key() {
+	var key = document.getElementById("key");
+	if(keys.has(key.value)) {
+		keys.delete(key.value);
+		localStorage.removeItem(key.value);
+		view_keys();
+		update_keys();
+		key.value = "";
+	}
+}
+function view_keys() {
+	document.getElementById("keys").innerHTML = "keys: "+[...keys].toString();
+}
+function access() {
+	var key = document.getElementById("key");
+	if(keys.has(key.value)) {
+		document.getElementById("p").value = localStorage.getItem(key.value);
+		key.value = "";
+	}
+}
+var input = document.getElementById("input");
+input.addEventListener("keyup", function(event) {
+  if (event.keyCode === 13) {
+   event.preventDefault();
+   document.getElementById("add").click();
+  }
+});
+function update() {
+	if(show) document.getElementById("words").innerHTML = [...words].toString();
+	else document.getElementById("words").innerHTML = "";
+}
+function show_words() {
+	show = true;
+	update();
+}
+function hide_words() {
+	show = false;
+	update();
+}
+function delete_all() {
+	words = new Set();
+	update();
+}
+function add() {
+	var inp = document.getElementById("input");
+	if(inp.value!="") words.add(inp.value);
+	inp.value="";
+	update();
+}
+function save() {
+	localStorage.setItem("words", JSON.stringify([...words]));
+}
+function retrieve() {
+	words = new Set(JSON.parse(localStorage.getItem("words")));
+	update();
+}
+function getRandom(arr, n) {
+    var result = new Array(n),
+        len = arr.length,
+        taken = new Array(len);
+    if (n > len)
+    	return arr;
+    while (n--) {
+        var x = Math.floor(Math.random() * len);
+        result[n] = arr[x in taken ? taken[x] : x];
+        taken[x] = --len in taken ? taken[len] : len;
+    }
+    return result;
+}
+function delete_element() {
+	var x = document.getElementById("delete");
+	words.delete(x.value);
+	x.value = "";
+	update();
+}
+function extract(n) {
+	extracted = getRandom([...words],n);
+	document.getElementById("extract").innerHTML = extracted.toString();
+}
+function delete_extracted() {
+	for(x in extracted) {
+		words.delete(extracted[x]);
+	}
+	document.getElementById("extract").innerHTML = extracted.toString();
+	update();
+}
+
+</script>
+</body>
+</html>
