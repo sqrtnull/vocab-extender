@@ -79,6 +79,10 @@ function upload_box() {
 		box.value = "";
 		return;
 	}
+	if(box.value=="/export") {
+		box.value = JSON.stringify(localStorage);
+		return;
+	}
 	var arr = box.value.split(" ");
 	for(i in arr) {
 		words.add(arr[i]);
