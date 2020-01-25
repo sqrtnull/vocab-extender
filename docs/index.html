@@ -51,7 +51,7 @@
 <button onclick="access()" class="safe">access</button>
 <button onclick="delete_key()" class="warn">delete</button>
 <button onclick="clear_box()" class="warn">clear text (above)</button>
-<button onclick="upload_box()" class="warn">upload words (above)</button>
+<button onclick="upload_box()" class="warn">load words (above)</button>
 <p id="keys" class="a"></p>
 
 <script>
@@ -71,9 +71,6 @@ function init() {
 	retrieve_keys();
 	retrieve_groups();
 	view_keys();
-}
-function purge() {
-	localStorage.clear();
 }
 function upload_box() {
 	var box = document.getElementById("p");
@@ -104,10 +101,7 @@ function change_group() {
 	if(inp.value!="") {
 		group = inp.value;
 		console.log(!groups.has(inp.value));
-		if(!groups.has(inp.value)) {
-			groups.add(inp.value);
-			console.log("adding group "+inp.value, groups);
-		}
+		if(!groups.has(inp.value)) groups.add(inp.value);
 		inp.value = "";
 		retrieve();
 		retrieve_keys();
@@ -128,11 +122,12 @@ function submit() {
 function clear_box() {
 	document.getElementById("p").value = "";
 }
+// keys
 function retrieve_keys() {
 	keys = new Set(JSON.parse(localStorage.getItem("vocab-extender-keys-"+group)));
 }
 function update_keys() {
-	localStorage.setItem("vocab-extender-keys"+group, JSON.stringify([...keys]));
+	localStorage.setItem("vocab-extender-keys-"+group, JSON.stringify([...keys]));
 }
 function delete_key() {
 	var key = document.getElementById("key");
@@ -154,6 +149,7 @@ function access() {
 		key.value = "";
 	}
 }
+// words / groups
 document.getElementById("input").addEventListener("keyup", function(event) {
   if (event.keyCode === 13) {
    event.preventDefault();
